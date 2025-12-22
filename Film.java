@@ -1,11 +1,11 @@
-import java.util.ArrayList;
-
 public class Film {
     String judul;
     String genre;
     int durasi;
     double rating;
-    ArrayList<JadwalTayang> jadwallist = new ArrayList<>();
+    JadwalTayang[] jadwallist = new JadwalTayang[10];
+    int jumlahJadwal = 0;
+    double diskon = 0;
 
     public Film(String judul, String genre, int durasi, double rating) {
         this.judul = judul;
@@ -30,12 +30,30 @@ public class Film {
         return rating;
     }
 
-    public ArrayList<JadwalTayang> getJadwalList() {
+    public JadwalTayang[] getJadwalList() {
         return jadwallist;
+    }
+
+    public int getJumlahJadwal() {
+        return jumlahJadwal;
     }
     
     public void tambahJadwal(JadwalTayang jadwal) {
-        jadwallist.add(jadwal);
+        if (jumlahJadwal >= jadwallist.length) {
+            System.out.println("Jadwal tayang penuh!");
+            return;
+        }
+
+        jadwallist[jumlahJadwal] = jadwal;
+        jumlahJadwal = jumlahJadwal + 1;
+    }
+
+    public void setDiskon(double diskon) {
+        this.diskon = diskon;
+    }
+
+    public double getDiskon() {
+        return diskon;
     }
 
     public String toString() {
