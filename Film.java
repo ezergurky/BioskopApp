@@ -1,10 +1,15 @@
 public class Film {
+    // Atribut film
     String judul;
     String genre;
     int durasi;
     double rating;
+
+    // Array tempat menyimpan jadwal tayang film
     JadwalTayang[] jadwallist = new JadwalTayang[10];
     int jumlahJadwal = 0;
+
+    // Diskon promo film
     double diskon = 0;
 
     public Film(String judul, String genre, int durasi, double rating) {
@@ -28,6 +33,22 @@ public class Film {
 
     public double getRating() {
         return rating;
+    }
+
+    public void setJudul(String judul) {
+        this.judul = judul;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public void setDurasi(int durasi) {
+        this.durasi = durasi;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public JadwalTayang[] getJadwalList() {
@@ -57,6 +78,7 @@ public class Film {
     }
 
     public String toString() {
-        return "Judul: " + judul + " | Genre: " + genre + " | Durasi: " + durasi + " menit | Rating: " + rating;
+        String promo = diskon > 0 ? " | Diskon: " + diskon + "%" : "";
+        return "Judul: " + judul + " | Genre: " + genre + " | Durasi: " + durasi + " menit" + " | Rating: " + rating + promo;
     }
 }
