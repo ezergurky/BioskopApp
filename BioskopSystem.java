@@ -27,8 +27,6 @@ public class BioskopSystem {
             System.out.println("6. Tambah Promo");
             System.out.println("7. Pesan Kursi");
             System.out.println("8. Tambah Jadwal Tayang");
-            System.out.println("9. Tampilkan Film Berdasarkan Genre");
-            System.out.println("10. Tampilkan Jadwal Film Berdasarkan Tanggal");
             System.out.println("0. Keluar");
             System.out.println("========================");
             System.out.print("Pilih: ");
@@ -127,6 +125,9 @@ public class BioskopSystem {
         System.out.print("Cari berdasarkan (judul/genre/tanggal): ");
         String kriteria = in.nextLine().toLowerCase();
 
+        // Cek ada atau tidak
+        boolean ditemukan = false;
+
         // Pencarian berdasarkan judul film
         if (kriteria.equals("judul")) {
             System.out.print("Masukkan judul: ");
@@ -135,6 +136,7 @@ public class BioskopSystem {
             for (int i = 0; i < jumlahFilm; i++) {
                 if (daftarFilm[i].getJudul().toLowerCase().contains(cari)) {
                     tampilkanFilmDenganJadwal(daftarFilm[i]);
+                    ditemukan = true;
                 }
             } 
 
@@ -146,6 +148,7 @@ public class BioskopSystem {
             for (int i = 0; i < jumlahFilm; i++) {
                 if (daftarFilm[i].getGenre().toLowerCase().contains(cari)) {
                     tampilkanFilmDenganJadwal(daftarFilm[i]);
+                    ditemukan = true;
                 }
             }
         // Pencarian berdasarkan tanggal film
@@ -161,9 +164,16 @@ public class BioskopSystem {
 
                     if (jt.getTanggal().equals(tanggal)) {
                         tampilkanFilmDenganJadwal(daftarFilm[i]);
+                        ditemukan = true;
                     }
                 }
             }
+        }
+
+        if (!ditemukan) {
+            System.out.println("\n-------------------------------------------");
+            System.out.println(" Mohon maaf, data film tidak ditemukan :( ");
+            System.out.println("-------------------------------------------");
         }
     }
 
