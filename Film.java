@@ -1,9 +1,12 @@
+import java.time.LocalDate;
+
 public class Film {
     // Atribut film
     String judul;
     String genre;
     int durasi;
     double rating;
+    double hargaTiket;
 
     // Array tempat menyimpan jadwal tayang film
     JadwalTayang[] jadwallist = new JadwalTayang[10];
@@ -11,12 +14,15 @@ public class Film {
 
     // Diskon promo film
     double diskon = 0;
+    LocalDate promoMulai;
+    LocalDate promoSelesai;
 
-    public Film(String judul, String genre, int durasi, double rating) {
+    public Film(String judul, String genre, int durasi, double rating, double hargaTiket) {
         this.judul = judul;
         this.genre = genre;
         this.durasi = durasi;
         this.rating = rating;
+        this.hargaTiket = hargaTiket;
     }
 
     public String getJudul() {
@@ -69,7 +75,9 @@ public class Film {
         jumlahJadwal = jumlahJadwal + 1;
     }
 
-    public void setDiskon(double diskon) {
+    public void setPromo(LocalDate mulai, LocalDate selesai, double diskon) {
+        this.promoMulai = mulai;
+        this.promoSelesai = selesai;
         this.diskon = diskon;
     }
 
@@ -77,8 +85,22 @@ public class Film {
         return diskon;
     }
 
+    public double getHargaTiket() {
+        return hargaTiket;
+    }
+
+    public void setHargaTiket(double hargaTiket) {
+        this.hargaTiket = hargaTiket;
+    }
+
+    public boolean isPromoAktif() {
+        if (promoMulai == null || promoSelesai == null) return false;
+        LocalDate today = LocalDate.now();
+        return !today.isBefore(promoMulai) && !today.isAfter(promoSelesai);
+    }
+
     public String toString() {
         String promo = diskon > 0 ? " | Diskon: " + diskon + "%" : "";
-        return "Judul: " + judul + " | Genre: " + genre + " | Durasi: " + durasi + " menit" + " | Rating: " + rating + promo;
+        return "Judul: " + judul + " | Genre: " + genre + " | Durasi: " + durasi + " menit" + " | Rating: " + rating + " | Harga: Rp" + hargaTiket + promo;
     }
 }

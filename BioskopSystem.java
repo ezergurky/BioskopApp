@@ -4,7 +4,7 @@ import java.time.LocalTime;
 
 public class BioskopSystem {
     // Menyimpan daftar film maksimal 100
-    Film[] daftarFilm = new Film[100];\
+    Film[] daftarFilm = new Film[100];
 
     // Menyimpan jumlah film
     int jumlahFilm = 0;
@@ -27,6 +27,8 @@ public class BioskopSystem {
             System.out.println("6. Tambah Promo");
             System.out.println("7. Pesan Kursi");
             System.out.println("8. Tambah Jadwal Tayang");
+            System.out.println("9. Tampilkan Film Berdasarkan Genre");
+            System.out.println("10. Tampilkan Jadwal Film Berdasarkan Tanggal");
             System.out.println("0. Keluar");
             System.out.println("========================");
             System.out.print("Pilih: ");
@@ -67,6 +69,8 @@ public class BioskopSystem {
         int durasi = in.nextInt();
         System.out.print("Rating: ");
         double rating  = in.nextDouble();
+        System.out.print("Harga tiket: ");
+        double harga = in.nextDouble();
         in.nextLine();
 
         // Validasi rating sesuai standar dari 0 - 10
@@ -76,34 +80,48 @@ public class BioskopSystem {
         }
 
         // Menambahkan objek film ke dalam array
-        daftarFilm[jumlahFilm] = new Film(judul, genre, durasi, rating);
+        daftarFilm[jumlahFilm] = new Film(judul, genre, durasi, rating, harga);
         jumlahFilm = jumlahFilm + 1;
 
         System.out.println("Film berhasil ditambahkan!");
     }
 
     public void tampilFilm() {
-        // Cek apakah film tidak ada
-        if (jumlahFilm == 0) {
-            System.out.println("Belum ada data film.");
-            return;
-        }
+        // Jika film tidak ada
+        if(isFilmEmpty()) return;
 
-        // Menampilakn semua daftar film
         System.out.println("\n========= DAFTAR FILM =========");
+        // Menampilan semua film yang tersedia
         for (int i = 0; i < jumlahFilm; i++) {
-            System.out.println((i + 1) + ". ");
-            tampilkanFilmDenganJadwal(daftarFilm[i]);
+            Film f = daftarFilm[i];
+            System.out.println((i + 1) + ") " + f.getJudul());
+            System.out.println("   Genre     : " + f.getGenre());
+            System.out.println("   Durasi    : " + f.getDurasi() + " menit");
+            System.out.println("   Rating    : " + f.getRating() + "/10");
+            System.out.println("   Harga     : Rp" + f.getHargaTiket());
+
+            if (f.getDiskon() > 0) {
+                System.out.println("Diskon    : " + f.getDiskon() + "%");
+            }
+
+            // Jika jadwal belum ada
+            if (f.getJumlahJadwal() == 0) {
+                System.out.println("   Jadwal    : - Belum ada jadwal -");
+            } else {
+                // Menampilkan jadwal dari film yang tersedia
+                System.out.println("   Jadwal:");
+                for (int j = 0; j < f.getJumlahJadwal(); j++) {
+                    System.out.println("      * " + f.getJadwalList()[j].getTanggal() + " | " + f.getJadwalList()[j].getJam());
+                }
+            }
+
+            System.out.println("---------------------------------------");
         }
-        System.out.println("==============================");
     }
 
     public void cariFilm() {
         // Cek apakah film tidak ada
-        if (jumlahFilm == 0) {
-            System.out.println("Belum ada data film.");
-            return;
-        }
+        if(isFilmEmpty()) return;
 
         // Menu pencarian berdasarkan kriteria tertentu
         System.out.print("Cari berdasarkan (judul/genre/tanggal): ");
@@ -142,7 +160,7 @@ public class BioskopSystem {
                     JadwalTayang jt = f.getJadwalList()[j];
 
                     if (jt.getTanggal().equals(tanggal)) {
-                        System.out.print("Masukkan tanggal (YYYY-MM-DD): ");
+                        tampilkanFilmDenganJadwal(daftarFilm[i]);
                     }
                 }
             }
@@ -151,10 +169,7 @@ public class BioskopSystem {
 
     public void editFilm() {
         // Cek apakah film tidak ada
-        if (jumlahFilm == 0) {
-            System.out.println("Belum ada data film.");
-            return;
-        }
+        if(isFilmEmpty()) return;
 
         System.out.print("Masukkan judul film yang ingin diedit: ");
         String cari = in.nextLine().toLowerCase();
@@ -178,6 +193,7 @@ public class BioskopSystem {
                 in.nextLine();
 
                 System.out.println("Film berhasil diperbarui!");
+
                 return;
             }
         }
@@ -186,16 +202,23 @@ public class BioskopSystem {
 
     public void hapusFilm() {
         // Cek apakah film tidak ada
-        if (jumlahFilm == 0) {
-            System.out.println("Belum ada data film.");
-            return;
-        }
+        if(isFilmEmpty()) return;
 
         System.out.print("Masukkan judul film yang ingin dihapus: ");
         String cari = in.nextLine().toLowerCase();
 
         for (int i = 0; i < jumlahFilm; i++) {
             if (daftarFilm[i].getJudul().toLowerCase().equals(cari)) {
+                System.out.println("\nFilm ditemukan:");
+                tampilkanFilmDenganJadwal(daftarFilm[i]);
+
+                System.out.print("Yakin ingin menghapus film ini? (y/n): ");
+                String confirm = in.nextLine().toLowerCase();
+
+                if (!confirm.equals("y")) {
+                    System.out.println("Penghapusan dibatalkan.");
+                    return;
+                }
 
                 for (int j = i; j < jumlahFilm - 1; j++) {
                     daftarFilm[j] = daftarFilm[j + 1];
@@ -213,15 +236,14 @@ public class BioskopSystem {
 
     public void tambahPromo() {
         // Cek apakah film tidak ada
-        if (jumlahFilm == 0) {
-            System.out.println("Belum ada data film.");
-            return;
-        }
+        if(isFilmEmpty()) return;
 
         System.out.print("Judul film promo: ");
         String cari = in.nextLine().toLowerCase();
 
         for (int i = 0; i < jumlahFilm; i++) {
+            Film f = daftarFilm[i];
+
             if (daftarFilm[i].getJudul().toLowerCase().equals(cari)) {
 
                 System.out.print("Diskon (%): ");
@@ -233,8 +255,16 @@ public class BioskopSystem {
                     return;
                 }
 
-                daftarFilm[i].setDiskon(diskon);
+                System.out.print("Tanggal Mulai Promo (YYYY-MM-DD): ");
+                LocalDate mulai = LocalDate.parse(in.nextLine());
+
+                System.out.print("Tanggal Selesai Promo (YYYY-MM-DD): ");
+                LocalDate selesai = LocalDate.parse(in.nextLine());
+
+                f.setPromo(mulai, selesai, diskon);
+                
                 System.out.println("Promo berhasil ditambahkan!");
+                System.out.println("Promo aktif dari " + mulai + " sampai " + selesai);
                 return;
             }
         }
@@ -243,10 +273,7 @@ public class BioskopSystem {
 
     public void pesanKursi() {
         // Cek apakah film tidak ada
-        if (jumlahFilm == 0) {
-            System.out.println("Belum ada data film.");
-            return;
-        }
+        if(isFilmEmpty()) return;
 
         System.out.print("Judul film: ");
         String cari = in.nextLine().toLowerCase();
@@ -283,8 +310,30 @@ public class BioskopSystem {
 
                 JadwalTayang jt = f.getJadwalList()[pilih];
 
+                // Logika jika kursi mencukupi atau tidak
                 if (jt.pesanKursi(jumlah)) {
-                    System.out.println("Pemesanan berhasil!");
+                    // Detail pemesanan kursi bioskop
+                    double hargaAwal = f.getHargaTiket() * jumlah;
+                    double potongan = 0;
+
+                    if (f.isPromoAktif()) {
+                        potongan = hargaAwal * (f.getDiskon() / 100);
+                        System.out.println("Promo berlaku! Diskon: " + f.getDiskon() + "%");
+                    } else {
+                        System.out.println("Promo tidak aktif untuk tanggal ini.");
+                    }
+
+                    double totalBayar = hargaAwal - potongan;
+
+                    System.out.println("\n=== Detail Pemesanan ===");
+                    System.out.println("Film       : " + f.getJudul());
+                    System.out.println("Jadwal     : " + jt.getTanggal() + " | " + jt.getJam());
+                    System.out.println("Jumlah     : " + jumlah + " kursi");
+                    System.out.println("Harga      : Rp" + f.getHargaTiket());
+                    System.out.println("Diskon     : " + f.getDiskon() + "%");
+                    System.out.println("--------------------------");
+                    System.out.println("Total Bayar: Rp" + totalBayar);
+                    System.out.println("==========================");
                 } else {
                     System.out.println("Kursi tidak mencukupi.");
                 }
@@ -295,10 +344,7 @@ public class BioskopSystem {
     }
 
     public void tambahJadwal() {
-        if (jumlahFilm == 0) {
-            System.out.println("Belum ada film.");
-            return;
-        }
+        if(isFilmEmpty()) return;
 
         System.out.print("Judul film: ");
         String cari = in.nextLine().toLowerCase();
@@ -316,6 +362,8 @@ public class BioskopSystem {
 
                 f.tambahJadwal(new JadwalTayang(tanggal, jam));
                 System.out.println("Jadwal tayang berhasil ditambahkan!");
+
+                tampilkanFilmDenganJadwal(daftarFilm[i]);
                 return;
             }
         }
@@ -323,18 +371,38 @@ public class BioskopSystem {
     }
 
     private void tampilkanFilmDenganJadwal(Film f) {
-        // Menampilkan semua data film
-        System.out.println(f);
+        System.out.println("\n========= DATA FILM =========");
+        System.out.println("Judul     : " + f.getJudul());
+        System.out.println("Genre     : " + f.getGenre());
+        System.out.println("Durasi    : " + f.getDurasi() + " menit");
+        System.out.println("Rating    : " + f.getRating() + "/10");
+        System.out.println("Harga     : Rp" + f.getHargaTiket());
 
-        // Cek jika film belum ada jadwal tayang
+        // jika ada diskon
+        if (f.getDiskon() > 0) {
+            System.out.println("Diskon    : " + f.getDiskon() + "%");
+        }
+
+        // jadwal tayang
         if (f.getJumlahJadwal() == 0) {
-            System.out.println("   └─ (Belum ada jadwal tayang)");
+            System.out.println("Jadwal    : - Belum ada jadwal tayang -");
         } else {
-            // Menampilakn semua jadwal tayang film
+            System.out.println("Jadwal    :");
             for (int j = 0; j < f.getJumlahJadwal(); j++) {
-                System.out.println("   ├─ Jadwal " + (j + 1) + ": " + f.getJadwalList()[j]);
+                JadwalTayang jd = f.getJadwalList()[j];
+                System.out.println("   * " + jd.getTanggal() + " | " + jd.getJam());
             }
         }
+
+        System.out.println("---------------------------------------"); // pemisah film
+    }
+
+    private boolean isFilmEmpty() {
+        if (jumlahFilm == 0) {
+            System.out.println("Belum ada data film.");
+            return true;
+        }
+        return false;
     }
 
     public void pause() {
