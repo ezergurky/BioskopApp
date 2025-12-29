@@ -88,7 +88,19 @@ public class BioskopSystem {
         // Jika film tidak ada
         if(isFilmEmpty()) return;
 
-        System.out.println("\n========= DAFTAR FILM =========");
+        // Sorting berdasarkan judul film
+        for (int i = 0; i < jumlahFilm - 1; i++) {
+            for (int j = 0; j < jumlahFilm - i - 1; j++) {
+                if (daftarFilm[j].getJudul().compareToIgnoreCase(daftarFilm[j+1].getJudul()) > 0) {
+                    Film temp = daftarFilm[j];
+                    daftarFilm[j] = daftarFilm[j+1];
+                    daftarFilm[j+1] = temp;
+                }
+            }
+        }
+
+        System.out.println("\n========= DAFTAR FILM (Sorted A-Z) =========");
+
         // Menampilan semua film yang tersedia
         for (int i = 0; i < jumlahFilm; i++) {
             Film f = daftarFilm[i];
@@ -98,8 +110,9 @@ public class BioskopSystem {
             System.out.println("   Rating    : " + f.getRating() + "/10");
             System.out.println("   Harga     : Rp" + f.getHargaTiket());
 
+            // Jika diskon ada
             if (f.getDiskon() > 0) {
-                System.out.println("Diskon    : " + f.getDiskon() + "%");
+                System.out.println("   Diskon    : " + f.getDiskon() + "%");
             }
 
             // Jika jadwal belum ada
@@ -112,7 +125,6 @@ public class BioskopSystem {
                     System.out.println("      * " + f.getJadwalList()[j].getTanggal() + " | " + f.getJadwalList()[j].getJam());
                 }
             }
-
             System.out.println("---------------------------------------");
         }
     }
